@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#080C18"/>
+<title>NEXTSTEP — ENEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#080C18;overflow:hidden;}
+::-webkit-scrollbar{display:none;}
+body{font-family:'Outfit',sans-serif;color:#EEF2FF;}
+
+#app{
+  width:100%;max-width:430px;height:100vh;height:100dvh;
+  margin:0 auto;background:#080C18;
+  display:flex;flex-direction:column;position:relative;overflow:hidden;
+}
+
+/* ── SCREENS ── */
+.screen-wrap{
+  flex:1;overflow:hidden;display:flex;flex-direction:column;
+  transition:opacity .2s ease,transform .2s ease;
+}
+.screen-wrap.fade-out{opacity:0;transform:translateY(10px);}
+.screen-content{
+  flex:1;overflow-y:auto;padding:20px 18px 16px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+/* ── NAV ── */
+nav{
+  flex-shrink:0;
+  background:rgba(8,12,24,0.97);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,0.07);
+  display:flex;padding:8px 0 env(safe-area-inset-bottom,14px);
+  z-index:100;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;opacity:.4;transition:opacity .2s;padding:4px 0;
+}
+.nav-item.active{opacity:1;}
+.nav-item span.icon{font-size:20px;}
+.nav-item span.label{font-size:10px;font-weight:500;color:#5A6A8A;}
+.nav-item.active span.label{color:#22D3EE;}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:#22D3EE;}
+
+/* ── SPLASH ── */
+#splash{
+  position:fixed;inset:0;z-index:999;
+  background:linear-gradient(145deg,#05001A,#0C0420,#020612);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .6s ease;
+}
+#splash.out{opacity:0;pointer-events:none;}
+.splash-glow{
+  position:absolute;width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,.4) 0%,transparent 70%);
+  filter:blur(50px);pointer-events:none;
+}
+.splash-inner{
+  display:flex;flex-direction:column;align-items:center;gap:22px;
+  transition:transform .6s ease;
+}
+.splash-inner.shrink{transform:scale(.88);}
+.splash-logo{
+  width:88px;height:88px;border-radius:28px;
+  background:linear-gradient(135deg,#8B5CF6,#22D3EE);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 80px rgba(139,92,246,.7);font-size:40px;
+}
+.splash-title{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;letter-spacing:5px;color:#fff;}
+.splash-sub{font-size:14px;color:rgba(255,255,255,.45);letter-spacing:1.5px;}
+
+/* ── ONBOARDING ── */
+#onboarding{
+  position:fixed;inset:0;z-index:998;background:#080C18;
+  display:flex;flex-direction:column;overflow-y:auto;
+  padding:44px 24px 60px;-webkit-overflow-scrolling:touch;
+}
+.ob-progress-bar{
+  height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:30px;overflow:hidden;
+}
+.ob-progress-fill{
+  height:100%;background:linear-gradient(90deg,#8B5CF6,#22D3EE);border-radius:2px;
+  transition:width .4s ease;
+}
+.ob-step{font-size:11px;color:#5A6A8A;margin-bottom:36px;letter-spacing:1px;}
+.ob-question{
+  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1.25;margin-bottom:40px;
+}
+.ob-input{
+  background:#0F1628;border:1.5px solid rgba(139,92,246,.45);border-radius:16px;
+  padding:18px 20px;color:#EEF2FF;font-size:18px;font-weight:500;outline:none;
+  font-family:'Outfit',sans-serif;width:100%;margin-bottom:16px;
+}
+.ob-input:focus{box-shadow:0 0 0 3px rgba(139,92,246,.25);border-color:rgba(139,92,246,.7);}
+.ob-btn{
+  padding:18px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);
+  border:none;border-radius:16px;color:#fff;font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:700;cursor:pointer;width:100%;
+  box-shadow:0 8px 30px rgba(139,92,246,.4);transition:opacity .2s;
+}
+.ob-btn:disabled{opacity:.4;cursor:not-allowed;}
+.ob-choice{
+  padding:18px 20px;background:#0F1628;border:1.5px solid rgba(255,255,255,.07);
+  border-radius:16px;color:#EEF2FF;font-size:15px;font-weight:500;cursor:pointer;
+  text-align:left;font-family:'Outfit',sans-serif;transition:border-color .2s;width:100%;
+  margin-bottom:12px;
+}
+.ob-choice:hover,.ob-choice:active{border-color:rgba(139,92,246,.5);}
+.ob-back{background:transparent;border:none;color:#5A6A8A;font-size:13px;cursor:pointer;margin-top:28px;}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);
+  background:linear-gradient(135deg,#8B5CF6,#22D3EE);
+  border-radius:20px;padding:12px 20px;font-size:13px;font-weight:700;
+  color:#fff;z-index:300;box-shadow:0 8px 30px rgba(139,92,246,.5);
+  white-space:nowrap;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── SECTION TITLE ── */
+.section-title{
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  color:#5A6A8A;text-transform:uppercase;letter-spacing:1.8px;
+  margin-bottom:12px;margin-top:4px;
+}
+
+/* ── CARDS ── */
+.card{
+  background:#0F1628;border:1px solid rgba(255,255,255,.07);
+  border-radius:16px;padding:16px;
+}
+.card-purple{
+  background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(34,211,238,.08));
+  border:1px solid rgba(139,92,246,.4);border-radius:16px;padding:16px;
+}
+
+/* ── PROGRESS BAR ── */
+.prog-track{height:6px;background:#172035;border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#8B5CF6,#22D3EE);transition:width .6s ease;}
+
+/* ── BACK BTN ── */
+.back-btn{
+  background:#172035;border:none;border-radius:10px;color:#EEF2FF;
+  font-size:18px;padding:8px 12px;cursor:pointer;flex-shrink:0;
+}
+
+/* ── MISSION ITEM ── */
+.mission-item{
+  background:#0F1628;border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12;
+  margin-bottom:8px;transition:all .3s;
+}
+.mission-done{border-color:rgba(34,211,238,.25);opacity:.65;}
+
+/* ── SUBJECT CARD ── */
+.subject-card{
+  background:#0F1628;border:1px solid rgba(255,255,255,.07);
+  border-radius:16px;padding:16px 14px;cursor:pointer;transition:border-color .2s;
+}
+
+/* ── CONFIRM MODAL ── */
+#confirm-modal{
+  position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+#confirm-modal.show{display:flex;}
+.confirm-box{
+  background:#0F1628;border:1px solid rgba(239,68,68,.3);
+  border-radius:20px;padding:28px 24px;max-width:340px;width:100%;
+  text-align:center;
+}
+
+/* ── PROFILE AVATAR ── */
+.avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,#8B5CF6,#22D3EE);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:32px;font-weight:800;
+  color:#fff;margin:0 auto 12px;box-shadow:0 0 30px rgba(139,92,246,.5);
+}
+
+/* ── TOGGLE ── */
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06);
+}
+.toggle-switch{
+  width:44px;height:24px;border-radius:12px;background:#172035;
+  border:1px solid rgba(255,255,255,.1);cursor:pointer;position:relative;
+  transition:background .2s;flex-shrink:0;
+}
+.toggle-switch.on{background:linear-gradient(135deg,#8B5CF6,#22D3EE);}
+.toggle-switch::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:16px;height:16px;border-radius:50%;background:#fff;
+  transition:transform .2s;
+}
+.toggle-switch.on::after{transform:translateX(20px);}
+
+/* ── ANIMATIONS ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-glow"></div>
+  <div class="splash-inner" id="splash-inner">
+    <div class="splash-logo">⚡</div>
+    <div class="splash-title">NEXTSTEP</div>
+    <div class="splash-sub">Sua aprovação começa agora.</div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding" style="display:none;">
+  <div class="ob-progress-bar"><div class="ob-progress-fill" id="ob-fill" style="width:0%"></div></div>
+  <div class="ob-step" id="ob-step-label">1 DE 5</div>
+  <div class="ob-question" id="ob-question"></div>
+  <div id="ob-fields"></div>
+  <button class="ob-back" id="ob-back" onclick="obBack()">← Voltar</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirm-modal">
+  <div class="confirm-box">
+    <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:10px">Resetar tudo?</div>
+    <div style="font-size:13px;color:#5A6A8A;margin-bottom:24px;line-height:1.6">
+      Todo o seu progresso, XP, módulos, Pomodoros e dados de onboarding serão apagados. Você voltará para a tela de cadastramento. Esta ação não pode ser desfeita.
+    </div>
+    <div style="display:flex;gap:12px">
+      <button onclick="closeConfirm()" style="flex:1;padding:14px;background:#172035;border:none;border-radius:14px;color:#EEF2FF;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Cancelar</button>
+      <button onclick="doReset()" style="flex:1;padding:14px;background:linear-gradient(135deg,#EF4444,#DC2626);border:none;border-radius:14px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Apagar tudo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
+
+  <div class="screen-wrap" id="screen-wrap">
+    <div class="screen-content" id="screen-content">
+      <!-- content injected by JS -->
+    </div>
+  </div>
+
+  <nav id="main-nav">
+    <div class="nav-item" data-screen="home" onclick="goTo('home')">
+      <span class="icon">🏠</span>
+      <span class="label">Início</span>
+    </div>
+    <div class="nav-item" data-screen="pomodoro" onclick="goTo('pomodoro')">
+      <span class="icon">⏱</span>
+      <span class="label">Focar</span>
+    </div>
+    <div class="nav-item" data-screen="subjects" onclick="goTo('subjects')">
+      <span class="icon">📚</span>
+      <span class="label">Matérias</span>
+    </div>
+    <div class="nav-item" data-screen="stats" onclick="goTo('stats')">
+      <span class="icon">📊</span>
+      <span class="label">Stats</span>
+    </div>
+    <div class="nav-item" data-screen="missions" onclick="goTo('missions')">
+      <span class="icon">🎯</span>
+      <span class="label">Missões</span>
+    </div>
+    <div class="nav-item" data-screen="profile" onclick="goTo('profile')">
+      <span class="icon">👤</span>
+      <span class="label">Perfil</span>
+    </div>
+  </nav>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   DATA DEFINITIONS
+═══════════════════════════════════════════════════ */
+const SUBJECTS_DEF = [
+  {id:"quim1",name:"Química 1",icon:"📘",color:"#38BDF8",modules:["Definições fundamentais","Separação de misturas","Modelos atômicos","Conceitos e semelhanças atômicas","Estudo da eletrosfera","Tabela periódica","Propriedades periódicas","Ligações interatômicas","Polaridade e geometria molecular","Interações intermoleculares","Número de oxidação","Funções inorgânicas: bases","Funções inorgânicas: ácidos","Funções inorgânicas: sais","Funções inorgânicas: óxidos","Reações: classificação e balanceamento","Reações de oxirredução","Massa atômica e molecular","Volume molar e leis ponderais","Estequiometria: caso geral","Estequiometria: rendimento","Estequiometria: pureza","Estequiometria: gases fora CNTP","Estequiometria: excesso de reagentes","Soluções: conceitos e gráficos","Unidades de concentração","Operações com soluções","Titulação","Propriedades coligativas","Cinética química","Química ambiental I","Química ambiental II"]},
+  {id:"quim2",name:"Química 2",icon:"🧪",color:"#38BDF8",modules:["Introdução à química orgânica","Classificação de cadeias carbônicas","Funções orgânicas","Isomeria","Reações orgânicas","Polímeros","Termoquímica","Equilíbrio químico","Equilíbrio iônico","Eletroquímica","Radioatividade"]},
+  {id:"fis1",name:"Física 1",icon:"⚙️",color:"#A78BFA",modules:["Ordem de grandeza","MRU","MRUV","Vetores","Lançamentos","Dinâmica","Gravitação","Trabalho e potência","Energia mecânica","Impulso e colisões","Hidrostática","Ondulatória","Acústica"]},
+  {id:"fis2",name:"Física 2",icon:"🔥",color:"#A78BFA",modules:["Termologia","Termodinâmica","Eletrostática","Circuitos elétricos","Magnetismo","Óptica"]},
+  {id:"bio1",name:"Biologia 1",icon:"🧬",color:"#34D399",modules:["Bioquímica","Citologia","Respiração celular","Fotossíntese","Genética molecular","Divisão celular","Embriologia","Histologia","Sistemas humanos"]},
+  {id:"bio2",name:"Biologia 2",icon:"🌱",color:"#34D399",modules:["Ecologia","Genética","Evolução","Microbiologia","Botânica","Zoologia"]},
+  {id:"mat1",name:"Matemática 1",icon:"📊",color:"#FBBF24",modules:["Progressões","Conjuntos","Funções","Exponenciais","Logaritmos","Matrizes","Estatística","Juros"]},
+  {id:"mat2",name:"Matemática 2",icon:"📐",color:"#FBBF24",modules:["Geometria plana","Trigonometria","Análise combinatória","Probabilidade","Geometria espacial","Geometria analítica"]},
+  {id:"port1",name:"Português 1",icon:"🇵🇹",color:"#F472B6",modules:["Gramática","Morfologia","Sintaxe","Pontuação","Orações","Verbos","Pronomes"]},
+  {id:"port2",name:"Português 2",icon:"📖",color:"#F472B6",modules:["Interpretação textual","Linguagem","Semântica","Figuras de linguagem","Intertextualidade","Gêneros textuais"]},
+  {id:"red",name:"Redação",icon:"✍️",color:"#2DD4BF",modules:["Estrutura dissertativa","Argumentação","Competências ENEM","Repertório sociocultural","Coesão","Proposta de intervenção"]},
+  {id:"lit",name:"Literatura",icon:"📚",color:"#FB923C",modules:["Escolas literárias","Modernismo","Romantismo","Realismo","Machado de Assis","Vanguardas"]},
+  {id:"fil",name:"Filosofia",icon:"🤔",color:"#60A5FA",modules:["Filosofia antiga","Medieval","Moderna","Contemporânea","Ética","Política"]},
+  {id:"soc",name:"Sociologia",icon:"👥",color:"#E879F9",modules:["Sociologia clássica","Cultura","Trabalho","Direitos humanos","Política","Tecnologia e sociedade"]},
+  {id:"hg",name:"História Geral",icon:"🏛️",color:"#F87171",modules:["Antiguidade","Idade Média","Revoluções","Guerras Mundiais","Guerra Fria"]},
+  {id:"hb",name:"Hist. Brasil",icon:"🇧🇷",color:"#F87171",modules:["Brasil Colonial","Império","República","Ditadura Militar","Nova República"]},
+  {id:"geo1",name:"Geografia 1",icon:"🌍",color:"#4ADE80",modules:["Geopolítica","Industrialização","Globalização","Conflitos mundiais","Regionalização"]},
+  {id:"geo2",name:"Geografia 2",icon:"🌎",color:"#4ADE80",modules:["Demografia","Urbanização","Agricultura","Clima","Biomas","Impactos ambientais"]},
+];
+
+const WEEK_LABELS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+
+const MISSIONS_DEF = [
+  {id:"m1",label:"Complete seu 1º módulo",xp:30,check:st=>Object.values(st.progress).some(a=>a.some(Boolean))},
+  {id:"m2",label:"Estude por 25 minutos (1 Pomodoro)",xp:50,check:st=>st.pomodorosTotal>=1},
+  {id:"m3",label:"Complete 3 módulos",xp:80,check:st=>Object.values(st.progress).flat().filter(Boolean).length>=3},
+  {id:"m4",label:"Complete 5 Pomodoros",xp:120,check:st=>st.pomodorosTotal>=5},
+  {id:"m5",label:"Estude 3 matérias diferentes",xp:100,check:st=>Object.entries(st.progress).filter(([,a])=>a.some(Boolean)).length>=3},
+  {id:"m6",label:"Complete 10 módulos",xp:200,check:st=>Object.values(st.progress).flat().filter(Boolean).length>=10},
+];
+
+const OB_STEPS = [
+  {key:"name",q:"Qual é o seu nome?",type:"text",ph:"Digite seu nome..."},
+  {key:"goal",q:"Qual é seu objetivo?",type:"choice",opts:["🎓 ENEM","🏛️ Vestibular","📚 Provas Escolares"]},
+  {key:"hours",q:"Quantas horas por dia você estuda?",type:"choice",opts:["1–2h","2–4h","4–6h","6h+"]},
+  {key:"hard",q:"Área com maior dificuldade?",type:"choice",opts:["Matemática","Humanas","Linguagens","Natureza"]},
+  {key:"peak",q:"Horário do dia que você rende mais?",type:"choice",opts:["☀️ Manhã","🌤 Tarde","🌙 Noite","🌃 Madrugada"]},
+];
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+const STORAGE_KEY = 'nextstep_v1';
+
+function initProgress(){
+  const p={};
+  SUBJECTS_DEF.forEach(s=>{p[s.id]=new Array(s.modules.length).fill(false);});
+  return p;
+}
+
+function defaultState(){
+  return {
+    obData:{},
+    progress:initProgress(),
+    xp:0,
+    streak:0,
+    pomodorosToday:0,
+    pomodorosTotal:0,
+    weekHours:new Array(7).fill(0),
+    todaySecs:0,
+    missionsDone:[],
+    settings:{notifications:true,sounds:true},
+    lastStudyDate:null,
+  };
+}
+
+let S = defaultState();
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }catch(e){}
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
+      // merge to add missing keys
+      S = Object.assign(defaultState(), saved);
+      // ensure progress has all subjects
+      SUBJECTS_DEF.forEach(sub=>{
+        if(!S.progress[sub.id]) S.progress[sub.id]=new Array(sub.modules.length).fill(false);
+        else if(S.progress[sub.id].length!==sub.modules.length){
+          const old=S.progress[sub.id];
+          S.progress[sub.id]=new Array(sub.modules.length).fill(false).map((v,i)=>old[i]||false);
+        }
+      });
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+/* ═══════════════════════════════════════════════════
+   DERIVED
+═══════════════════════════════════════════════════ */
+function totalModules(){ return SUBJECTS_DEF.reduce((a,s)=>a+s.modules.length,0); }
+function doneModules(){ return Object.values(S.progress).flat().filter(Boolean).length; }
+function totalPct(){ return Math.round((doneModules()/totalModules())*100); }
+function todayHours(){ return +(S.todaySecs/3600).toFixed(1); }
+function weekTotal(){ return +S.weekHours.reduce((a,b)=>a+b,0).toFixed(1); }
+function level(){ return Math.floor(S.xp/200)+1; }
+function xpToNext(){ return 200-(S.xp%200); }
+function firstName(){ return (S.obData.name||"Estudante").split(" ")[0]; }
+function userName(){ return S.obData.name||"Estudante"; }
+function getGreeting(){
+  const h=new Date().getHours();
+  return h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
+}
+
+/* ═══════════════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════════════ */
+let currentScreen = "home";
+let selectedSubject = null;
+let pomRunning = false;
+let pomTime = 25*60;
+let pomPhase = "focus"; // focus | break
+let pomCycle = 1;
+let pomInterval = null;
+let ambSound = 3;
+let obStep = 0;
+let obData = {};
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  const hasSave = loadState();
+  // show splash
+  const splash = document.getElementById('splash');
+  const splashInner = document.getElementById('splash-inner');
+  setTimeout(()=>{
+    splashInner.classList.add('shrink');
+    splash.classList.add('out');
+    setTimeout(()=>{
+      splash.style.display='none';
+      if(hasSave && S.obData.name){
+        // check streak
+        checkStreak();
+        showApp();
+      } else {
+        showOnboarding();
+      }
+    },600);
+  },2400);
+});
+
+function checkStreak(){
+  const today = new Date().toDateString();
+  if(S.lastStudyDate && S.lastStudyDate!==today){
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    if(S.lastStudyDate!==yesterday.toDateString()) S.streak=0;
+  }
+}
+
+function showApp(){
+  document.getElementById('onboarding').style.display='none';
+  document.getElementById('app').style.display='flex';
+  renderScreen(currentScreen);
+}
+
+function showOnboarding(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('onboarding').style.display='flex';
+  obStep=0; obData={};
+  renderOb();
+}
+
+/* ═══════════════════════════════════════════════════
+   ONBOARDING
+═══════════════════════════════════════════════════ */
+function renderOb(){
+  const step = OB_STEPS[obStep];
+  const pct = (obStep/OB_STEPS.length)*100;
+  document.getElementById('ob-fill').style.width=pct+'%';
+  document.getElementById('ob-step-label').textContent=`${obStep+1} DE ${OB_STEPS.length}`;
+  document.getElementById('ob-question').textContent=step.q;
+  document.getElementById('ob-back').style.visibility=obStep>0?'visible':'hidden';
+
+  const f=document.getElementById('ob-fields');
+  f.innerHTML='';
+
+  if(step.type==='text'){
+    f.innerHTML=`
+      <input id="ob-text" class="ob-input" placeholder="${step.ph}" autocomplete="off" autocorrect="off"/>
+      <button class="ob-btn" id="ob-cont-btn" disabled onclick="obNext(document.getElementById('ob-text').value.trim())">Continuar →</button>
+    `;
+    const inp=document.getElementById('ob-text');
+    inp.addEventListener('input',()=>{
+      document.getElementById('ob-cont-btn').disabled=!inp.value.trim();
+    });
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&inp.value.trim()) obNext(inp.value.trim());
+    });
+    setTimeout(()=>inp.focus(),100);
+  } else {
+    step.opts.forEach(o=>{
+      const btn=document.createElement('button');
+      btn.className='ob-choice';
+      btn.textContent=o;
+      btn.onclick=()=>obNext(o);
+      f.appendChild(btn);
+    });
+  }
+}
+
+function obNext(val){
+  obData[OB_STEPS[obStep].key]=val;
+  if(obStep<OB_STEPS.length-1){
+    obStep++;
+    renderOb();
+  } else {
+    S.obData=obData;
+    S.streak=1;
+    S.lastStudyDate=new Date().toDateString();
+    saveState();
+    showApp();
+  }
+}
+
+function obBack(){
+  if(obStep>0){ obStep--; renderOb(); }
+}
+
+/* ═══════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════ */
+function goTo(screen){
+  if(screen!=='pomodoro') stopPomodoro();
+  const wrap=document.getElementById('screen-wrap');
+  wrap.classList.add('fade-out');
+  setTimeout(()=>{
+    currentScreen=screen;
+    if(screen!=='subject-detail') selectedSubject=null;
+    renderScreen(screen);
+    wrap.classList.remove('fade-out');
+    updateNav();
+  },120);
+}
+
+function updateNav(){
+  const active = currentScreen==='subject-detail'?'subjects':currentScreen;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    const s=el.dataset.screen;
+    el.classList.toggle('active',s===active);
+    // update dot
+    const existing=el.querySelector('.nav-dot');
+    if(existing) existing.remove();
+    if(s===active){
+      const dot=document.createElement('div');
+      dot.className='nav-dot';
+      el.appendChild(dot);
+    }
+  });
+}
+
+function renderScreen(screen){
+  const content=document.getElementById('screen-content');
+  // scroll to top
+  content.scrollTop=0;
+  switch(screen){
+    case 'home': content.innerHTML=renderHome(); break;
+    case 'pomodoro': content.innerHTML=renderPomodoro(); initPomodoroUI(); break;
+    case 'subjects': content.innerHTML=renderSubjects(); break;
+    case 'subject-detail': content.innerHTML=renderSubjectDetail(); break;
+    case 'stats': content.innerHTML=renderStats(); break;
+    case 'missions': content.innerHTML=renderMissions(); break;
+    case 'profile': content.innerHTML=renderProfile(); break;
+    default: content.innerHTML=renderHome();
+  }
+  updateNav();
+}
+
+/* ═══════════════════════════════════════════════════
+   HOME
+═══════════════════════════════════════════════════ */
+function renderHome(){
+  const maxH=Math.max(...S.weekHours,0.1);
+  const today=new Date().getDay();
+  const pending=MISSIONS_DEF.filter(m=>!S.missionsDone.includes(m.id)).slice(0,3);
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;padding-top:12px">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800">${getGreeting()}, ${firstName()} 👋</div>
+      <div style="font-size:12px;color:#5A6A8A;margin-top:3px">${S.obData.goal||'ENEM'} · ${S.streak} ${S.streak===1?'dia':'dias'} 🔥</div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(34,211,238,.1));border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:6px 14px;display:flex;align-items:center;gap:5px;cursor:pointer" onclick="goTo('profile')">
+      <span>⭐</span>
+      <span style="font-size:12px;font-weight:700;font-family:'Syne',sans-serif;color:#22D3EE">${S.xp} XP · Nv.${level()}</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#5A6A8A;margin-bottom:8px">
+      <span>Nível ${level()}</span><span>${xpToNext()} XP para Nível ${level()+1}</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" style="width:${((S.xp%200)/200)*100}%"></div></div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:20px">
+    ${[
+      {n:todayHours()>0?todayHours()+'h':'0min',l:'Hoje',a:false},
+      {n:weekTotal()+'h',l:'Semana',a:true},
+      {n:doneModules(),l:'Módulos',a:false},
+    ].map(s=>`
+      <div style="flex:1;background:${s.a?'linear-gradient(135deg,rgba(139,92,246,.25),rgba(34,211,238,.08))':'#0F1628'};border:1px solid ${s.a?'rgba(139,92,246,.45)':'rgba(255,255,255,.07)'};border-radius:16px;padding:14px 10px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800">${s.n}</div>
+        <div style="font-size:11px;color:#5A6A8A;margin-top:2px">${s.l}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">Progresso Geral ENEM</span>
+      <span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#22D3EE">${totalPct()}%</span>
+    </div>
+    <div style="height:8px;background:#172035;border-radius:4px;overflow:hidden;margin-bottom:8px">
+      <div style="height:100%;border-radius:4px;background:linear-gradient(90deg,#8B5CF6,#22D3EE);width:${totalPct()}%;transition:width .8s ease"></div>
+    </div>
+    <div style="font-size:11px;color:#5A6A8A">${doneModules()} de ${totalModules()} módulos concluídos</div>
+  </div>
+
+  <div class="section-title">Esta semana</div>
+  <div style="display:flex;align-items:flex-end;gap:6px;height:90px;margin-bottom:20px">
+    ${S.weekHours.map((h,i)=>`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%">
+        <div style="flex:1;width:100%;display:flex;align-items:flex-end">
+          <div style="width:100%;border-radius:6px 6px 0 0;min-height:4px;background:${i===today?'#8B5CF6':h>0?'rgba(139,92,246,.35)':'rgba(255,255,255,.05)'};height:${(h/maxH)*100}%;transition:height .6s ease"></div>
+        </div>
+        <div style="font-size:9px;color:${i===today?'#22D3EE':'#5A6A8A'}">${WEEK_LABELS[i]}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="section-title">Próximas Missões</div>
+  ${pending.length===0?'<div style="text-align:center;padding:20px;color:#5A6A8A;font-size:13px">🎉 Todas as missões concluídas!</div>':
+    pending.map(m=>`
+      <div style="background:#0F1628;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.12);flex-shrink:0"></div>
+        <div style="flex:1;font-size:13px;font-weight:500">${m.label}</div>
+        <div style="font-size:11px;font-weight:700;color:#FBBF24">+${m.xp}XP</div>
+      </div>`).join('')}
+
+  <button onclick="goTo('pomodoro')" style="width:100%;margin-top:8px;padding:18px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);border:none;border-radius:18px;color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 30px rgba(139,92,246,.4)">
+    <span style="font-size:20px">▶</span> Iniciar Sessão de Estudos
+  </button>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════
+   POMODORO
+═══════════════════════════════════════════════════ */
+function renderPomodoro(){
+  const mins=String(Math.floor(pomTime/60)).padStart(2,'0');
+  const secs=String(pomTime%60).padStart(2,'0');
+  const r=96, circ=2*Math.PI*r;
+  const phaseDur=pomPhase==='focus'?25*60:5*60;
+  const elapsed=phaseDur-pomTime;
+  const dashOffset=circ*(1-elapsed/phaseDur);
+
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-top:10px">
+    <button class="back-btn" onclick="stopPomodoro();goTo('home')">←</button>
+    <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">Sessão de Estudo</span>
+    <div style="background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3);border-radius:20px;padding:4px 10px;font-size:11px;color:#22D3EE;font-weight:600">${S.pomodorosToday} hoje</div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none">
+    ${SUBJECTS_DEF.slice(0,8).map(s=>`
+      <div onclick="selectPomSubject('${s.id}')" style="background:#0F1628;border:1px solid ${selectedSubject&&selectedSubject.id===s.id?s.color:'rgba(255,255,255,.07)'};border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;color:${selectedSubject&&selectedSubject.id===s.id?s.color:'inherit'}">${s.icon} ${s.name}</div>`).join('')}
+  </div>
+
+  ${pomRunning?'<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:8px 14px;font-size:11px;color:#F87171;margin-bottom:14px;text-align:center">🔒 Modo Foco Ativo — Mantenha o foco!</div>':''}
+
+  <div style="position:relative;width:240px;height:240px;margin:0 auto 24px">
+    <svg style="width:100%;height:100%" viewBox="0 0 220 220">
+      <defs>
+        <linearGradient id="ag" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="${pomPhase==='focus'?'#8B5CF6':'#06B6D4'}"/>
+          <stop offset="100%" stop-color="${pomPhase==='focus'?'#22D3EE':'#34D399'}"/>
+        </linearGradient>
+      </defs>
+      <circle cx="110" cy="110" r="96" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="12"/>
+      <circle id="pom-arc" cx="110" cy="110" r="96" fill="none" stroke="url(#ag)" stroke-width="12"
+        stroke-dasharray="${circ}"
+        stroke-dashoffset="${dashOffset}"
+        stroke-linecap="round" transform="rotate(-90 110 110)"
+        style="transition:stroke-dashoffset 1s linear"/>
+    </svg>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;color:#5A6A8A;text-transform:uppercase">${pomPhase==='focus'?'FOCO':'PAUSA'}</div>
+      <div id="pom-time" style="font-family:'Syne',sans-serif;font-size:50px;font-weight:800;letter-spacing:-2px;line-height:1;margin:4px 0">${mins}:${secs}</div>
+      <div style="font-size:11px;color:#5A6A8A">Ciclo ${pomCycle} · Total: ${S.pomodorosTotal}🍅</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px">
+    <button onclick="resetPomodoro()" style="width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;background:#172035;color:#EEF2FF;font-size:18px;display:flex;align-items:center;justify-content:center">↺</button>
+    <button id="pom-play-btn" onclick="togglePomodoro()" style="width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#8B5CF6,#22D3EE);color:#fff;font-size:26px;box-shadow:0 6px 25px rgba(139,92,246,.5);display:flex;align-items:center;justify-content:center">${pomRunning?'⏸':'▶'}</button>
+    <button onclick="stopPomodoro();goTo('home')" style="width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;background:#172035;color:#EEF2FF;font-size:18px;display:flex;align-items:center;justify-content:center">■</button>
+  </div>
+
+  <div style="margin-bottom:20px">
+    <div style="font-size:11px;color:#5A6A8A;margin-bottom:8px">Ambiente sonoro</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${["🌧 Chuva","🌊 Ondas","☕ Café","🌙 Silêncio"].map((a,i)=>`
+        <div onclick="setAmb(${i})" style="background:${i===ambSound?'rgba(139,92,246,.2)':'#172035'};border:1px solid ${i===ambSound?'rgba(139,92,246,.5)':'rgba(255,255,255,.07)'};border-radius:20px;padding:6px 12px;font-size:11px;cursor:pointer;color:${i===ambSound?'#22D3EE':'inherit'}">${a}</div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card" style="display:flex;justify-content:space-around">
+    ${[{n:S.pomodorosToday,l:'Hoje'},{n:S.pomodorosTotal,l:'Total'},{n:todayHours()+'h',l:'Estudado'}].map(s=>`
+      <div style="text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#22D3EE">${s.n}</div>
+        <div style="font-size:11px;color:#5A6A8A;margin-top:2px">${s.l}</div>
+      </div>`).join('')}
+  </div>
+  `;
+}
+
+function initPomodoroUI(){
+  // nothing extra needed; timer uses global state
+}
+
+function selectPomSubject(id){
+  selectedSubject=SUBJECTS_DEF.find(s=>s.id===id)||null;
+  renderScreen('pomodoro');
+}
+
+function setAmb(i){
+  ambSound=i;
+  // re-render chips only
+  const chips=document.querySelectorAll('[onclick^="setAmb"]');
+  const labels=["🌧 Chuva","🌊 Ondas","☕ Café","🌙 Silêncio"];
+  chips.forEach((el,idx)=>{
+    el.style.background=idx===i?'rgba(139,92,246,.2)':'#172035';
+    el.style.borderColor=idx===i?'rgba(139,92,246,.5)':'rgba(255,255,255,.07)';
+    el.style.color=idx===i?'#22D3EE':'inherit';
+  });
+}
+
+function togglePomodoro(){
+  pomRunning=!pomRunning;
+  const btn=document.getElementById('pom-play-btn');
+  if(btn) btn.innerHTML=pomRunning?'⏸':'▶';
+  if(pomRunning) startPomTimer();
+  else clearInterval(pomInterval);
+}
+
+function startPomTimer(){
+  clearInterval(pomInterval);
+  pomInterval=setInterval(()=>{
+    // update study time
+    S.todaySecs++;
+    S.lastStudyDate=new Date().toDateString();
+    const today=new Date().getDay();
+    S.weekHours[today]=+((S.weekHours[today]+1/3600).toFixed(4));
+
+    pomTime--;
+    updatePomDisplay();
+
+    if(pomTime<=0){
+      clearInterval(pomInterval);
+      pomRunning=false;
+      if(pomPhase==='focus'){
+        S.pomodorosTotal++;
+        S.pomodorosToday++;
+        addXp(50);
+        checkMissions();
+        saveState();
+        pomPhase='break';
+        pomTime=5*60;
+        showToast('🍅 Pomodoro concluído! Hora de descansar.');
+      } else {
+        pomPhase='focus';
+        pomCycle++;
+        pomTime=25*60;
+        showToast('☕ Pausa acabou! Hora de focar.');
+      }
+      renderScreen('pomodoro');
+    } else {
+      // save periodically
+      if(S.todaySecs%30===0) saveState();
+    }
+  },1000);
+}
+
+function updatePomDisplay(){
+  const el=document.getElementById('pom-time');
+  if(el) el.textContent=`${String(Math.floor(pomTime/60)).padStart(2,'0')}:${String(pomTime%60).padStart(2,'0')}`;
+  // update arc
+  const arc=document.getElementById('pom-arc');
+  if(arc){
+    const r=96, circ=2*Math.PI*r;
+    const phaseDur=pomPhase==='focus'?25*60:5*60;
+    const elapsed=phaseDur-pomTime;
+    arc.style.strokeDashoffset=circ*(1-elapsed/phaseDur);
+  }
+}
+
+function stopPomodoro(){
+  clearInterval(pomInterval);
+  pomRunning=false;
+}
+
+function resetPomodoro(){
+  stopPomodoro();
+  pomTime=25*60; pomPhase='focus';
+  renderScreen('pomodoro');
+}
+
+/* ═══════════════════════════════════════════════════
+   SUBJECTS
+═══════════════════════════════════════════════════ */
+function renderSubjects(){
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-top:12px">
+    <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">Matérias</div>
+    <span style="color:#22D3EE;font-size:12px;font-weight:700">${totalPct()}% total</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    ${SUBJECTS_DEF.map(s=>{
+      const done=S.progress[s.id]?.filter(Boolean).length||0;
+      const pct=Math.round((done/s.modules.length)*100);
+      return `
+        <div class="subject-card" onclick="openSubject('${s.id}')">
+          <div style="font-size:22px;margin-bottom:8px">${s.icon}</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:10px;line-height:1.3">${s.name}</div>
+          <div style="height:4px;background:#172035;border-radius:2px;overflow:hidden;margin-bottom:5px">
+            <div style="height:100%;border-radius:2px;background:${s.color};width:${pct}%;transition:width .5s ease"></div>
+          </div>
+          <div style="font-size:10px;color:#5A6A8A">${done}/${s.modules.length} aulas</div>
+        </div>`;
+    }).join('')}
+  </div>
+  `;
+}
+
+function openSubject(id){
+  selectedSubject=SUBJECTS_DEF.find(s=>s.id===id);
+  const wrap=document.getElementById('screen-wrap');
+  wrap.classList.add('fade-out');
+  setTimeout(()=>{
+    currentScreen='subject-detail';
+    renderScreen('subject-detail');
+    wrap.classList.remove('fade-out');
+    updateNav();
+  },120);
+}
+
+/* ═══════════════════════════════════════════════════
+   SUBJECT DETAIL
+═══════════════════════════════════════════════════ */
+function renderSubjectDetail(){
+  if(!selectedSubject) return renderSubjects();
+  const s=selectedSubject;
+  const done=S.progress[s.id]?.filter(Boolean).length||0;
+  const pct=Math.round((done/s.modules.length)*100);
+
+  return `
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-top:10px">
+    <button class="back-btn" onclick="goTo('subjects')">←</button>
+    <span style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800">${s.icon} ${s.name}</span>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:13px">Progresso</span>
+      <span style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#22D3EE">${pct}%</span>
+    </div>
+    <div style="height:8px;background:#172035;border-radius:4px;overflow:hidden;margin-bottom:16px">
+      <div style="height:100%;border-radius:4px;background:${s.color};width:${pct}%;transition:width .6s ease"></div>
+    </div>
+    <div style="display:flex;justify-content:space-around">
+      ${[{n:done,l:'Concluídas'},{n:s.modules.length-done,l:'Pendentes'},{n:s.modules.length,l:'Total'}].map(st=>`
+        <div style="text-align:center">
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800">${st.n}</div>
+          <div style="font-size:10px;color:#5A6A8A;margin-top:2px">${st.l}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:8px">
+    ${s.modules.map((mod,i)=>{
+      const isDone=S.progress[s.id]?.[i]||false;
+      return `
+        <div onclick="toggleModule('${s.id}',${i})" style="background:#0F1628;border:1px solid ${isDone?s.color+'44':'rgba(255,255,255,.07)'};border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s">
+          <div style="width:30px;height:30px;border-radius:50%;background:${isDone?s.color:'transparent'};border:${isDone?'none':'2px solid rgba(255,255,255,.15)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${isDone?'#fff':'#5A6A8A'};flex-shrink:0;transition:all .2s">
+            ${isDone?'✓':i+1}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;opacity:${isDone?.6:1}">${mod}</div>
+            <div style="font-size:11px;color:#5A6A8A;margin-top:2px">${isDone?'Concluído · +20 XP':'Toque para concluir'}</div>
+          </div>
+          ${isDone?'<div style="font-size:11px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:3px 10px;color:#A78BFA">Revisar</div>':''}
+        </div>`;
+    }).join('')}
+  </div>
+  `;
+}
+
+function toggleModule(subjId, idx){
+  const wasOff=!S.progress[subjId][idx];
+  S.progress[subjId][idx]=!S.progress[subjId][idx];
+  if(wasOff) addXp(20);
+  checkMissions();
+  saveState();
+  // re-render in place
+  renderScreen('subject-detail');
+}
+
+/* ═══════════════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════════════ */
+function renderStats(){
+  const maxH=Math.max(...S.weekHours,0.1);
+  const today=new Date().getDay();
+  const subjectsWithProgress=SUBJECTS_DEF.filter(s=>(S.progress[s.id]?.filter(Boolean).length||0)>0)
+    .sort((a,b)=>(S.progress[b.id]?.filter(Boolean).length||0)-(S.progress[a.id]?.filter(Boolean).length||0))
+    .slice(0,6);
+
+  return `
+  <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:18px;padding-top:12px">Estatísticas</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px">
+    <div style="grid-column:span 2" class="card-purple">
+      <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800">${weekTotal()}h</div>
+      <div style="font-size:11px;color:#5A6A8A;margin-top:4px">Total esta semana</div>
+    </div>
+    ${[{v:todayHours()+'h',l:'Hoje'},{v:S.streak+'🔥',l:'Streak'},{v:S.pomodorosTotal+'🍅',l:'Pomodoros'},{v:doneModules(),l:'Módulos'}].map(c=>`
+      <div class="card">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800">${c.v}</div>
+        <div style="font-size:11px;color:#5A6A8A;margin-top:4px">${c.l}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="section-title">Horas esta semana</div>
+  <div style="display:flex;align-items:flex-end;gap:6px;height:120px;margin-bottom:22px">
+    ${S.weekHours.map((h,i)=>`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%">
+        ${h>0?`<div style="font-size:9px;color:#5A6A8A">${h.toFixed(1)}h</div>`:''}
+        <div style="flex:1;width:100%;display:flex;align-items:flex-end">
+          <div style="width:100%;border-radius:6px 6px 0 0;min-height:4px;background:${i===today?'#8B5CF6':h>0?'rgba(139,92,246,.35)':'rgba(255,255,255,.04)'};height:${(h/maxH)*100}%;transition:height .6s ease"></div>
+        </div>
+        <div style="font-size:9px;color:${i===today?'#22D3EE':'#5A6A8A'}">${WEEK_LABELS[i]}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="section-title">Matérias com progresso</div>
+  ${subjectsWithProgress.length===0?'<div style="text-align:center;padding:30px 0;color:#5A6A8A;font-size:13px">Complete módulos nas matérias para ver seus dados aqui!</div>':
+    subjectsWithProgress.map(s=>{
+      const done=S.progress[s.id]?.filter(Boolean).length||0;
+      const pct=Math.round((done/s.modules.length)*100);
+      return `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-size:16px;width:24px;text-align:center">${s.icon}</div>
+          <div style="font-size:12px;width:90px;flex-shrink:0">${s.name}</div>
+          <div style="flex:1;height:6px;background:#172035;border-radius:3px;overflow:hidden">
+            <div style="height:100%;border-radius:3px;background:${s.color};width:${pct}%;transition:width .5s ease"></div>
+          </div>
+          <div style="font-size:11px;color:#5A6A8A;width:30px;text-align:right">${pct}%</div>
+        </div>`;
+    }).join('')}
+
+  <div class="section-title" style="margin-top:4px">Insight da IA</div>
+  <div style="background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(34,211,238,.05));border:1px solid rgba(139,92,246,.25);border-radius:16px;padding:16px;display:flex;gap:12px;align-items:flex-start">
+    <div style="font-size:26px;flex-shrink:0">🤖</div>
+    <div style="font-size:13px;line-height:1.65;color:rgba(238,242,255,.85)">
+      ${doneModules()===0
+        ?`Olá, ${firstName()}! Você ainda não começou. Vá em Matérias, escolha uma e marque o primeiro módulo. Cada módulo vale +20 XP. Bora? 💪`
+        :doneModules()<5
+        ?`Ótimo começo, ${firstName()}! Você já concluiu ${doneModules()} módulo${doneModules()>1?'s':''}. Continue assim — consistência é o segredo.`
+        :`${firstName()}, você está indo muito bem! ${doneModules()} módulos concluídos e ${S.pomodorosTotal} Pomodoros. ${S.obData.hours==='6h+'?'Seu ritmo é intenso — lembre-se das pausas!':'Tente aumentar para mais sessões por dia.'}`}
+    </div>
+  </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════
+   MISSIONS
+═══════════════════════════════════════════════════ */
+function renderMissions(){
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-top:12px">
+    <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">Missões</div>
+    <div style="font-size:13px;font-weight:700;color:#22D3EE">⭐ ${S.xp} XP</div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,rgba(251,146,60,.18),rgba(239,68,68,.08));border:1px solid rgba(251,146,60,.3);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:20px">
+    <div style="font-size:40px">🔥</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#FBBF24">${S.streak} ${S.streak===1?'dia':'dias'} seguidos</div>
+      <div style="font-size:11px;color:#5A6A8A;margin-top:2px">${S.streak===0?'Comece a estudar para iniciar seu streak!':'Continue estudando todo dia!'}</div>
+    </div>
+  </div>
+
+  <div class="section-title">Missões</div>
+  ${MISSIONS_DEF.map(m=>{
+    const done=S.missionsDone.includes(m.id);
+    return `
+      <div style="background:#0F1628;border:1px solid ${done?'rgba(34,211,238,.25)':'rgba(255,255,255,.07)'};border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;opacity:${done?.65:1}">
+        <div style="width:28px;height:28px;border-radius:50%;background:${done?'#22C55E':'transparent'};border:${done?'none':'2px solid rgba(255,255,255,.12)'};display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0">
+          ${done?'✓':''}
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">${m.label}</div>
+          ${done?'<div style="font-size:10px;color:#22C55E;margin-top:2px">Concluída ✓</div>':''}
+        </div>
+        <div style="font-size:12px;font-weight:700;color:${done?'#5A6A8A':'#FBBF24'}">+${m.xp}XP</div>
+      </div>`;
+  }).join('')}
+
+  <div class="section-title">Conquistas</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+    ${[
+      {icon:"🥇",label:"Primeiro módulo",earned:doneModules()>=1},
+      {icon:"🍅",label:"5 Pomodoros",earned:S.pomodorosTotal>=5},
+      {icon:"📚",label:"3 matérias",earned:Object.entries(S.progress).filter(([,a])=>a.some(Boolean)).length>=3},
+      {icon:"⭐",label:"100 XP",earned:S.xp>=100},
+      {icon:"🔥",label:"3 dias seguidos",earned:S.streak>=3},
+      {icon:"🏆",label:"10 módulos",earned:doneModules()>=10},
+    ].map(a=>`
+      <div style="background:${a.earned?'rgba(139,92,246,.15)':'#172035'};border:1px solid ${a.earned?'rgba(139,92,246,.5)':'rgba(255,255,255,.06)'};border-radius:14px;padding:14px 10px;text-align:center;opacity:${a.earned?1:.35};transition:all .3s">
+        <div style="font-size:26px;margin-bottom:6px">${a.icon}</div>
+        <div style="font-size:10px;color:#5A6A8A;font-weight:600">${a.label}</div>
+      </div>`).join('')}
+  </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════
+   PROFILE
+═══════════════════════════════════════════════════ */
+function renderProfile(){
+  const initials=userName().split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const subjectsStudied=Object.entries(S.progress).filter(([,a])=>a.some(Boolean)).length;
+  const completedMissions=S.missionsDone.length;
+
+  return `
+  <div style="padding-top:12px">
+    <!-- HEADER -->
+    <div style="text-align:center;padding:24px 0 20px">
+      <div class="avatar">${initials||'👤'}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800">${userName()}</div>
+      <div style="font-size:13px;color:#5A6A8A;margin-top:4px">${S.obData.goal||'ENEM'} · ${S.obData.peak||''}</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(34,211,238,.1));border:1px solid rgba(139,92,246,.3);border-radius:20px;padding:6px 16px;margin-top:12px">
+        <span>⭐</span>
+        <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#22D3EE">Nível ${level()} · ${S.xp} XP</span>
+      </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px">
+      ${[
+        {n:S.streak+'🔥',l:'Streak'},
+        {n:doneModules(),l:'Módulos'},
+        {n:S.pomodorosTotal,l:'Pomodoros'},
+      ].map(s=>`
+        <div class="card" style="text-align:center;padding:12px 8px">
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800">${s.n}</div>
+          <div style="font-size:10px;color:#5A6A8A;margin-top:3px">${s.l}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="section-title">Suas respostas</div>
+    <div class="card" style="margin-bottom:20px">
+      ${[
+        {label:'Objetivo',value:S.obData.goal||'—'},
+        {label:'Horas/dia',value:S.obData.hours||'—'},
+        {label:'Dificuldade',value:S.obData.hard||'—'},
+        {label:'Melhor horário',value:S.obData.peak||'—'},
+      ].map((row,i,arr)=>`
+        <div style="display:flex;justify-content:space-between;padding:12px 0;${i<arr.length-1?'border-bottom:1px solid rgba(255,255,255,.06)':''}">
+          <span style="font-size:13px;color:#5A6A8A">${row.label}</span>
+          <span style="font-size:13px;font-weight:600">${row.value}</span>
+        </div>`).join('')}
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="section-title">Configurações</div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="toggle-row">
+        <div>
+          <div style="font-size:14px;font-weight:600">Notificações</div>
+          <div style="font-size:11px;color:#5A6A8A;margin-top:2px">Lembretes de estudo</div>
+        </div>
+        <div class="toggle-switch ${S.settings.notifications?'on':''}" onclick="toggleSetting('notifications')"></div>
+      </div>
+      <div class="toggle-row" style="border-bottom:none">
+        <div>
+          <div style="font-size:14px;font-weight:600">Sons</div>
+          <div style="font-size:11px;color:#5A6A8A;margin-top:2px">Sons de ambiente e alertas</div>
+        </div>
+        <div class="toggle-switch ${S.settings.sounds?'on':''}" onclick="toggleSetting('sounds')"></div>
+      </div>
+    </div>
+
+    <!-- SOBRE -->
+    <div class="section-title">Sobre</div>
+    <div class="card" style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="font-size:13px;color:#5A6A8A">Versão</span>
+        <span style="font-size:13px;font-weight:600">NEXTSTEP v3.0</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="font-size:13px;color:#5A6A8A">Matérias</span>
+        <span style="font-size:13px;font-weight:600">${SUBJECTS_DEF.length} disponíveis</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px 0">
+        <span style="font-size:13px;color:#5A6A8A">Módulos</span>
+        <span style="font-size:13px;font-weight:600">${totalModules()} no total</span>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="section-title" style="color:#F87171">Zona de perigo</div>
+    <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:16px;padding:18px;margin-bottom:32px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Resetar progresso</div>
+      <div style="font-size:12px;color:#5A6A8A;margin-bottom:16px;line-height:1.6">Apaga todo o progresso, XP, Pomodoros, módulos e dados do perfil. Você voltará para a tela inicial de cadastramento.</div>
+      <button onclick="showConfirm()" style="width:100%;padding:14px;background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(220,38,38,.1));border:1px solid rgba(239,68,68,.35);border-radius:14px;color:#F87171;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer">
+        🗑️ Resetar tudo e começar do zero
+      </button>
+    </div>
+  </div>
+  `;
+}
+
+function toggleSetting(key){
+  S.settings[key]=!S.settings[key];
+  saveState();
+  // update toggle visually
+  renderScreen('profile');
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════ */
+function showConfirm(){
+  document.getElementById('confirm-modal').classList.add('show');
+}
+function closeConfirm(){
+  document.getElementById('confirm-modal').classList.remove('show');
+}
+function doReset(){
+  closeConfirm();
+  // clear storage
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  // reset state
+  S=defaultState();
+  // reset pomodoro
+  stopPomodoro();
+  pomTime=25*60; pomPhase='focus'; pomCycle=1; ambSound=3;
+  selectedSubject=null;
+  currentScreen='home';
+  // go to onboarding
+  document.getElementById('app').style.display='none';
+  document.getElementById('onboarding').style.display='flex';
+  obStep=0; obData={};
+  renderOb();
+}
+
+/* ═══════════════════════════════════════════════════
+   XP & MISSIONS
+═══════════════════════════════════════════════════ */
+function addXp(amt){
+  S.xp+=amt;
+  saveState();
+}
+
+function checkMissions(){
+  const st={progress:S.progress, pomodorosTotal:S.pomodorosTotal, streak:S.streak};
+  MISSIONS_DEF.forEach(m=>{
+    if(!S.missionsDone.includes(m.id) && m.check(st)){
+      S.missionsDone.push(m.id);
+      addXp(m.xp);
+      showToast('🎉 Missão concluída: '+m.label);
+    }
+  });
+  saveState();
+}
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+let toastTimer=null;
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
